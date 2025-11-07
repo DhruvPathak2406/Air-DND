@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Sign in to your Air-DND account."/>
+  <title>Login | Air-DND</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #14b8a6;
+      --success: #10b981;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #f472b6;
+      --accent: #2dd4bf;
+      --success: #34d399;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+      animation: gradientShift 15s ease infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(5%, -5%) rotate(120deg); }
+      66% { transform: translate(-5%, 5%) rotate(240deg); }
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    [data-theme="dark"] .site-header {
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+
+    .brand:hover {
+      transform: scale(1.05);
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      transition: color 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .toggle {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .center-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 5%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 60px var(--shadow);
+      transition: all 0.3s;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-card:hover {
+      box-shadow: 0 24px 70px var(--shadow);
+      transform: translateY(-5px);
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 0.4rem;
+      margin-bottom: 2rem;
+      gap: 0.5rem;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 0.8rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .auth-card h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .auth-card > p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .form-container {
+      position: relative;
+    }
+
+    .auth-form {
+      width: 100%;
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .field {
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+
+    .field span {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .password-field {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: color 0.3s;
+      padding: 0.5rem;
+    }
+
+    .password-toggle:hover {
+      color: var(--primary);
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      margin-top: -0.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .terms {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-top: 1rem;
+    }
+
+    .terms a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .terms a:hover {
+      text-decoration: underline;
+    }
+
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 5%;
+      text-align: center;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .role-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .role-card {
+      padding: 1.2rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      background: var(--bg);
+    }
+
+    .role-card:hover {
+      border-color: var(--primary);
+      background: var(--surface);
+    }
+
+    .role-card.selected {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .role-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .role-card .label {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .auth-card {
+        padding: 2rem;
+        margin: 1rem;
+      }
+
+      .auth-card h2 {
+        font-size: 1.75rem;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .role-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .center-wrap {
+        padding: 2rem 5%;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=100&h=100&fit=crop" class="logo" alt="Air-DND Logo">
+      <span>Air-DND</span>
+    </a>
+    <nav class="nav">
+      <a class="nav-link" href="index.html"><span>Home</span></a>
+      <a class="nav-link active" href="login.html"><span>Login</span></a>
+      <button id="dark-toggle" class="toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <main class="center-wrap">
+    <div class="auth-card">
+      
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="signin">Sign In</button>
+        <button class="mode-btn" data-mode="signup">Sign Up</button>
+      </div>
+
+      <h2 id="auth-title">Welcome Back</h2>
+      <p id="auth-subtitle">Sign in to access your dashboard</p>
+
+      <div class="form-container">
+        
+        <!-- Sign In Form -->
+        <form id="signinForm" class="auth-form active">
+          
+          <label class="field">
+            <span>I am a</span>
+            <div class="role-cards">
+              <div class="role-card" data-role="landlord">
+                <span class="icon">🏠</span>
+                <span class="label">Landlord</span>
+              </div>
+              <div class="role-card" data-role="tenant">
+                <span class="icon">👤</span>
+                <span class="label">Tenant</span>
+              </div>
+            </div>
+            <input type="hidden" id="signin-role" name="role" required>
+          </label>
+
+          <label class="field">
+            <span>Username or Email</span>
+            <input 
+              type="text" 
+              name="username"
+              placeholder="Enter your username or email" 
+              required 
+              autocomplete="username"
+            />
+          </label>
+
+          <label class="field">
+            <span>Password</span>
+            <div class="password-field">
+              <input 
+                type="password"
+                name="password" 
+                placeholder="Enter your password" 
+                required 
+                autocomplete="current-password"
+              />
+              <button type="button" class="password-toggle">👁️</button>
+            </div>
+          </label>
+
+          <a href="#" class="forgot-link">Forgot password?</a>
+
+          <button class="btn" type="submit"><span>Sign In</span></button>
+
+          <div class="terms">
+            By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          </div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="signupForm" class="auth-form">
+          
+          <label class="field">
+            <span>I am a</span>
+            <div class="role-cards" id="signup-role-cards">
+              <div class="role-card" data-role="landlord">
+                <span class="icon">🏠</span>
+                <span class="label">Landlord</span>
+              </div>
+              <div class="role-card" data-role="tenant">
+                <span class="icon">👤</span>
+                <span class="label">Tenant</span>
+              </div>
+            </div>
+            <input type="hidden" id="signup-role" name="role" required>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>First Name</span>
+              <input 
+                type="text"
+                name="firstName" 
+                placeholder="John" 
+                required 
+              />
+            </label>
+
+            <label class="field">
+              <span>Last Name</span>
+              <input 
+                type="text"
+                name="lastName" 
+                placeholder="Doe" 
+                required 
+              />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Email Address</span>
+            <input 
+              type="email"
+              name="email" 
+              placeholder="john.doe@example.com" 
+              required 
+              autocomplete="email"
+            />
+          </label>
+
+          <label class="field">
+            <span>Phone Number</span>
+            <input 
+              type="tel"
+              name="phone" 
+              placeholder="+91 98765 43210" 
+              required 
+            />
+          </label>
+
+          <label class="field">
+            <span>Username</span>
+            <input 
+              type="text"
+              name="username" 
+              placeholder="Choose a unique username" 
+              required 
+              minlength="3"
+            />
+          </label>
+
+          <label class="field">
+            <span>Password</span>
+            <div class="password-field">
+              <input 
+                type="password"
+                name="password" 
+                placeholder="Create a strong password" 
+                required 
+                minlength="8"
+                autocomplete="new-password"
+              />
+              <button type="button" class="password-toggle">👁️</button>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>Confirm Password</span>
+            <div class="password-field">
+              <input 
+                type="password"
+                name="confirmPassword" 
+                placeholder="Re-enter your password" 
+                required 
+                minlength="8"
+                autocomplete="new-password"
+              />
+              <button type="button" class="password-toggle">👁️</button>
+            </div>
+          </label>
+
+          <button class="btn" type="submit"><span>Create Account</span></button>
+
+          <div class="terms">
+            By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 Air-DND Property Management. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('dark-toggle');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Mode toggle
+    const modeButtons = document.querySelectorAll('.mode-btn');
+    const signinForm = document.getElementById('signinForm');
+    const signupForm = document.getElementById('signupForm');
+    const authTitle = document.getElementById('auth-title');
+    const authSubtitle = document.getElementById('auth-subtitle');
+
+    modeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        
+        modeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (mode === 'signin') {
+          signinForm.classList.add('active');
+          signupForm.classList.remove('active');
+          authTitle.textContent = 'Welcome Back';
+          authSubtitle.textContent = 'Sign in to access your dashboard';
+        } else {
+          signupForm.classList.add('active');
+          signinForm.classList.remove('active');
+          authTitle.textContent = 'Create Account';
+          authSubtitle.textContent = 'Join Air-DND and start managing properties';
+        }
+      });
+    });
+
+    // Check for preselected role from home page
+    const preselectedRole = localStorage.getItem('preselectedRole');
+    if (preselectedRole) {
+      // Auto-select the role card
+      const signinRoleCards = document.querySelectorAll('#signinForm .role-card');
+      const signupRoleCards = document.querySelectorAll('#signup-role-cards .role-card');
+      
+      signinRoleCards.forEach(card => {
+        if (card.dataset.role === preselectedRole) {
+          card.classList.add('selected');
+          document.getElementById('signin-role').value = preselectedRole;
+        }
+      });
+      
+      signupRoleCards.forEach(card => {
+        if (card.dataset.role === preselectedRole) {
+          card.classList.add('selected');
+          document.getElementById('signup-role').value = preselectedRole;
+        }
+      });
+      
+      // Clear the preselected role
+      localStorage.removeItem('preselectedRole');
+    }
+
+    // Role selection for signin
+    const signinRoleCards = document.querySelectorAll('#signinForm .role-card');
+    const signinRoleInput = document.getElementById('signin-role');
+
+    signinRoleCards.forEach(card => {
+      card.addEventListener('click', () => {
+        signinRoleCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        signinRoleInput.value = card.dataset.role;
+      });
+    });
+
+    // Role selection for signup
+    const signupRoleCards = document.querySelectorAll('#signup-role-cards .role-card');
+    const signupRoleInput = document.getElementById('signup-role');
+
+    signupRoleCards.forEach(card => {
+      card.addEventListener('click', () => {
+        signupRoleCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        signupRoleInput.value = card.dataset.role;
+      });
+    });
+
+    // Password toggle for all password fields
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        const type = input.type === 'password' ? 'text' : 'password';
+        input.type = type;
+        btn.textContent = type === 'password' ? '👁️' : '🙈';
+      });
+    });
+
+    // Sign In form submission
+    signinForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const role = signinRoleInput.value;
+      if (!role) {
+        alert('Please select your role (Landlord or Tenant)');
+        return;
+      }
+
+      const formData = new FormData(signinForm);
+      const data = Object.fromEntries(formData);
+      data.role = role;
+      
+      console.log('Sign In:', data);
+      
+      // Store user role in localStorage
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      // Redirect based on role
+      if (role === 'landlord') {
+        window.location.href = 'landlord.html';
+      } else {
+        window.location.href = 'tenant.html';
+      }
+    });
+
+    // Sign Up form submission
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const role = signupRoleInput.value;
+      if (!role) {
+        alert('Please select your role (Landlord or Tenant)');
+        return;
+      }
+
+      const formData = new FormData(signupForm);
+      const password = formData.get('password');
+      const confirmPassword = formData.get('confirmPassword');
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+
+      const data = Object.fromEntries(formData);
+      data.role = role;
+      delete data.confirmPassword;
+      
+      console.log('Sign Up:', data);
+      
+      // Store user role in localStorage
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userName', data.firstName + ' ' + data.lastName);
+      
+      alert('Account created successfully!');
+      
+      // Redirect based on role
+      if (role === 'landlord') {
+        window.location.href = 'landlord.html';
+      } else {
+        window.location.href = 'tenant.html';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Learn about our mission to simplify rental property management for landlords and tenants."/>
+  <title>About Us | Air-DND</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #14b8a6;
+      --success: #10b981;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #f472b6;
+      --accent: #2dd4bf;
+      --success: #34d399;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+
+    .brand:hover {
+      transform: scale(1.05);
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      transition: color 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .toggle {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .about-hero {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 5rem 5%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent);
+      border-radius: 50%;
+      animation: float1 10s ease-in-out infinite;
+    }
+
+    .about-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40%;
+      right: -15%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+      border-radius: 50%;
+      animation: float2 12s ease-in-out infinite;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(30px, -30px) rotate(180deg); }
+    }
+
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      50% { transform: translate(-40px, 20px) rotate(-180deg); }
+    }
+
+    .about-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .about-hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 1.2rem;
+      font-weight: 800;
+    }
+
+    .about-hero p {
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      opacity: 0.95;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .about-body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 5%;
+    }
+
+    .glass {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem;
+      margin-bottom: 3rem;
+      transition: all 0.3s;
+    }
+
+    .glass:hover {
+      box-shadow: 0 16px 40px var(--shadow);
+      transform: translateY(-4px);
+    }
+
+    .glass p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .glass p:last-child {
+      margin-bottom: 0;
+    }
+
+    .glass h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .glass strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .highlights {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .highlight {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .highlight::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .highlight:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 50px var(--shadow);
+    }
+
+    .highlight:hover::before {
+      transform: scaleX(1);
+    }
+
+    .highlight h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .highlight p {
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .panel {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border-radius: 20px;
+      padding: 2.5rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .panel:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px var(--shadow);
+    }
+
+    .panel:hover::before {
+      opacity: 1;
+    }
+
+    .panel h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel p {
+      line-height: 1.7;
+      opacity: 0.95;
+      position: relative;
+      z-index: 1;
+      font-size: 1rem;
+    }
+
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 5%;
+      text-align: center;
+      color: var(--text-muted);
+      margin-top: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .about-body {
+        padding: 3rem 5%;
+      }
+
+      .glass {
+        padding: 2rem;
+      }
+
+      .highlights {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .highlight, .panel {
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=100&h=100&fit=crop" class="logo" alt="Air-DND Logo">
+      <span>Air-DND</span>
+    </a>
+    <nav class="nav">
+      <a class="nav-link" href="index.html"><span>Home</span></a>
+      <a class="nav-link active" href="about.html"><span>About</span></a>
+      <a class="nav-link" href="contact.html"><span>Contact</span></a>
+      <a class="nav-link" href="#" id="myPropertiesLink"><span>My Properties</span></a>
+      <a class="nav-link" href="#" id="logoutLink"><span>Logout</span></a>
+      <button id="dark-toggle" class="toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <section class="about-hero">
+    <h1>Transforming Rental Management</h1>
+    <p>Our mission is to simplify and digitalize property management for landlords and tenants everywhere.</p>
+  </section>
+
+  <section class="about-body">
+    <div class="glass">
+      <p>
+        Air-DND was created to solve the challenges of traditional rental property management. 
+        We understand that managing properties shouldn't involve mountains of paperwork, missed payments, or delayed communication.
+      </p>
+      <p>
+        Our platform automates the entire rental lifecycle — from tenant onboarding and rent collection to lease management 
+        and maintenance coordination. By centralizing all property data and communication in one intuitive dashboard, we ensure 
+        accuracy, transparency, and convenience for everyone involved.
+      </p>
+      <p>
+        Whether you're a landlord managing multiple properties or a tenant looking for a seamless rental experience, 
+        our system provides the tools you need to succeed.
+      </p>
+    </div>
+
+    <div class="highlights">
+      <article class="highlight">
+        <h3>🎯 Centralized Platform</h3>
+        <p>One unified space where landlords and tenants can collaborate, communicate, and manage all rental activities efficiently.</p>
+      </article>
+      
+      <article class="highlight">
+        <h3>⚡ Smart Automation</h3>
+        <p>Automatic rent reminders, instant receipt generation, and digital record-keeping eliminate manual tasks and human error.</p>
+      </article>
+      
+      <article class="highlight">
+        <h3>🔍 Full Transparency</h3>
+        <p>Clear timelines, real-time status updates, and comprehensive audit trails ensure everyone stays informed and accountable.</p>
+      </article>
+    </div>
+
+    <div class="about-grid">
+      <article class="panel">
+        <h3>For Landlords</h3>
+        <p>
+          Manage multiple properties from a single dashboard. View rent payment status, track occupancy rates, 
+          review tenant information, and handle maintenance requests instantly. Our analytics help you make 
+          data-driven decisions and maximize your rental income.
+        </p>
+      </article>
+      
+      <article class="panel">
+        <h3>For Tenants</h3>
+        <p>
+          Enjoy a hassle-free rental experience with easy online rent payments, instant access to lease agreements, 
+          and a streamlined maintenance request system. Track your payment history, download receipts, and communicate 
+          directly with your landlord — all from your personal tenant portal.
+        </p>
+      </article>
+    </div>
+
+    <div class="glass">
+      <h2>Why Choose Air-DND?</h2>
+      <p>
+        <strong>Security First:</strong> Your data is encrypted and stored securely. We comply with industry standards 
+        to protect your sensitive information.
+      </p>
+      <p>
+        <strong>24/7 Access:</strong> Access your dashboard anytime, anywhere, from any device. Mobile-friendly design 
+        ensures you can manage properties on the go.
+      </p>
+      <p>
+        <strong>Continuous Innovation:</strong> We regularly update our platform with new features based on user feedback 
+        and industry best practices.
+      </p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>© 2025 Air-DND Property Management. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('dark-toggle');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Handle navigation based on user role
+    const userRole = localStorage.getItem('userRole');
+    const myPropertiesLink = document.getElementById('myPropertiesLink');
+    const logoutLink = document.getElementById('logoutLink');
+
+    if (userRole === 'landlord') {
+      myPropertiesLink.href = 'landlord.html';
+    } else if (userRole === 'tenant') {
+      myPropertiesLink.href = 'tenant.html';
+    } else {
+      // If no role selected, hide these links
+      myPropertiesLink.style.display = 'none';
+      logoutLink.style.display = 'none';
+    }
+
+    logoutLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

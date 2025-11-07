@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Landlord Dashboard | Air-DND</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #14b8a6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #f472b6;
+      --accent: #2dd4bf;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+
+    .brand:hover {
+      transform: scale(1.05);
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      transition: color 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .toggle {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 3rem 5%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .page-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 2.5rem);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-hero p {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem 5%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.8rem;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+
+    .stat:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px var(--shadow);
+      border-color: var(--primary);
+    }
+
+    .stat:hover::before {
+      transform: scaleX(1);
+    }
+
+    .stat h4 {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.8rem;
+    }
+
+    .stat strong {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: block;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem 5% 4rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .property-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .property-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .property-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px var(--shadow);
+      border-color: var(--primary);
+    }
+
+    .property-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .property-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .property-card:hover .property-image {
+      transform: scale(1.1);
+    }
+
+    .property-image-container {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .property-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .badge-available {
+      background: rgba(16, 185, 129, 0.9);
+      color: white;
+    }
+
+    .badge-occupied {
+      background: rgba(99, 102, 241, 0.9);
+      color: white;
+    }
+
+    .property-content {
+      padding: 1.8rem;
+    }
+
+    .property-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .property-location {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .property-details {
+      list-style: none;
+      margin-top: 1rem;
+    }
+
+    .property-details li {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .property-details li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .property-details strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .property-details span {
+      color: var(--text-muted);
+    }
+
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 5%;
+      text-align: center;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 1.5rem 5%;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 5% 3rem;
+      }
+
+      .stat strong {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=100&h=100&fit=crop" class="logo" alt="Air-DND Logo">
+      <span>Air-DND</span>
+    </a>
+    <nav class="nav" id="mainNav">
+      <a class="nav-link" href="index.html"><span>Home</span></a>
+      <a class="nav-link" href="about.html"><span>About</span></a>
+      <a class="nav-link active" href="landlord.html"><span>Landlord</span></a>
+      <a class="nav-link" href="tenant.html"><span>Tenant</span></a>
+      <a class="nav-link" href="contact.html"><span>Contact</span></a>
+      <button id="dark-toggle" class="toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <h1>Landlord Dashboard</h1>
+    <p>Overview of your properties and tenant activity</p>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <h4>Properties</h4>
+      <strong id="ll-total-props">12</strong>
+    </div>
+    <div class="stat">
+      <h4>Units Rented</h4>
+      <strong id="ll-rented">10</strong>
+    </div>
+    <div class="stat">
+      <h4>Pending Rent</h4>
+      <strong id="ll-pending">₹75,000</strong>
+    </div>
+    <div class="stat">
+      <h4>Open Requests</h4>
+      <strong id="ll-requests">5</strong>
+    </div>
+  </section>
+
+  <section class="cards-grid" id="ll-props"></section>
+
+  <footer class="site-footer">
+    <p>© 2025 Air-DND Property Management. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('dark-toggle');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Dynamic navigation based on user role
+    document.addEventListener('DOMContentLoaded', () => {
+      const userRole = localStorage.getItem('userRole');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const nav = document.getElementById('mainNav');
+      
+      if (isLoggedIn && userRole) {
+        // Remove both landlord and tenant links
+        const links = nav.querySelectorAll('.nav-link');
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === 'landlord.html' || href === 'tenant.html') {
+            link.remove();
+          }
+        });
+        
+        // Add user's dashboard link
+        const dashboardLink = document.createElement('a');
+        dashboardLink.className = 'nav-link active';
+        dashboardLink.href = userRole === 'landlord' ? 'landlord.html' : 'tenant.html';
+        dashboardLink.innerHTML = `<span>${userRole === 'landlord' ? 'My Properties' : 'My Dashboard'}</span>`;
+        
+        // Add logout button
+        const logoutBtn = document.createElement('a');
+        logoutBtn.className = 'nav-link';
+        logoutBtn.href = '#';
+        logoutBtn.innerHTML = '<span>Logout</span>';
+        logoutBtn.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.href = 'login.html';
+        };
+        
+        const toggleBtn = nav.querySelector('.toggle');
+        nav.insertBefore(dashboardLink, toggleBtn);
+        nav.insertBefore(logoutBtn, toggleBtn);
+      }
+    });
+
+    const properties = [
+      {
+        title: 'Sunrise Apartments',
+        location: 'Vesu, Surat',
+        image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop',
+        status: 'occupied',
+        details: [
+          { label: 'Type', value: '2 BHK' },
+          { label: 'Rent', value: '₹25,000/month' },
+          { label: 'Tenant', value: 'Raj Patel' },
+          { label: 'Lease End', value: 'Jun 30, 2026' }
+        ]
+      },
+      {
+        title: 'Green Valley Villa',
+        location: 'Adajan, Surat',
+        image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop',
+        status: 'available',
+        details: [
+          { label: 'Type', value: '3 BHK Villa' },
+          { label: 'Rent', value: '₹45,000/month' },
+          { label: 'Status', value: 'Available Now' },
+          { label: 'Deposit', value: '₹90,000' }
+        ]
+      },
+      {
+        title: 'Skyline Residency',
+        location: 'Piplod, Surat',
+        image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop',
+        status: 'occupied',
+        details: [
+          { label: 'Type', value: '1 BHK' },
+          { label: 'Rent', value: '₹18,000/month' },
+          { label: 'Tenant', value: 'Priya Shah' },
+          { label: 'Lease End', value: 'Dec 15, 2025' }
+        ]
+      },
+      {
+        title: 'Royal Heights',
+        location: 'Citylight, Surat',
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=400&fit=crop',
+        status: 'occupied',
+        details: [
+          { label: 'Type', value: '2 BHK' },
+          { label: 'Rent', value: '₹28,000/month' },
+          { label: 'Tenant', value: 'Amit Kumar' },
+          { label: 'Lease End', value: 'Mar 31, 2026' }
+        ]
+      },
+      {
+        title: 'Park View Apartments',
+        location: 'Ghod Dod Road, Surat',
+        image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&h=400&fit=crop',
+        status: 'available',
+        details: [
+          { label: 'Type', value: '2 BHK' },
+          { label: 'Rent', value: '₹22,000/month' },
+          { label: 'Status', value: 'Available Now' },
+          { label: 'Deposit', value: '₹44,000' }
+        ]
+      },
+      {
+        title: 'Ocean Breeze',
+        location: 'Dumas Road, Surat',
+        image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop',
+        status: 'occupied',
+        details: [
+          { label: 'Type', value: '3 BHK Penthouse' },
+          { label: 'Rent', value: '₹55,000/month' },
+          { label: 'Tenant', value: 'Neha Desai' },
+          { label: 'Lease End', value: 'Aug 20, 2026' }
+        ]
+      }
+    ];
+
+    const propsGrid = document.getElementById('ll-props');
+    properties.forEach(prop => {
+      const card = document.createElement('article');
+      card.className = 'property-card';
+      
+      card.innerHTML = `
+        <div class="property-image-container">
+          <img src="${prop.image}" alt="${prop.title}" class="property-image">
+          <span class="property-badge badge-${prop.status}">
+            ${prop.status === 'occupied' ? 'Occupied' : 'Available'}
+          </span>
+        </div>
+        <div class="property-content">
+          <h3 class="property-title">${prop.title}</h3>
+          <p class="property-location">📍 ${prop.location}</p>
+          <ul class="property-details">
+            ${prop.details.map(d => `
+              <li><strong>${d.label}</strong><span>${d.value}</span></li>
+            `).join('')}
+          </ul>
+        </div>
+      `;
+      
+      propsGrid.appendChild(card);
+    });
+  </script>
+</body>
+</html>

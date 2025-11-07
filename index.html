@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Simplify property management with automated rent collection, digital leases, and maintenance tracking."/>
+  <title>Air-DND | Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #14b8a6;
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #f472b6;
+      --accent: #2dd4bf;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.05) 0%, transparent 50%);
+      animation: backgroundFloat 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    [data-theme="dark"] body::before {
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.1) 0%, transparent 50%);
+    }
+
+    @keyframes backgroundFloat {
+      0%, 100% { 
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      33% { 
+        transform: translate(30px, -30px) scale(1.1);
+        opacity: 0.8;
+      }
+      66% { 
+        transform: translate(-30px, 30px) scale(0.9);
+        opacity: 0.9;
+      }
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float-particle 15s infinite ease-in-out;
+    }
+
+    @keyframes float-particle {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.3;
+      }
+      90% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(50px);
+        opacity: 0;
+      }
+    }
+
+    /* Header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    [data-theme="dark"] .site-header {
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .site-header.scrolled {
+      padding: 0.7rem 5%;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: transform 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand:hover {
+      transform: scale(1.05);
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      transition: color 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .toggle {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    /* Carousel */
+    .carousel {
+      position: relative;
+      height: 90vh;
+      min-height: 500px;
+      overflow: hidden;
+      margin-top: 72px;
+    }
+
+    .slides {
+      display: flex;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .slide {
+      position: relative;
+      min-width: 100%;
+      height: 100%;
+    }
+
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.8s;
+      filter: brightness(0.9);
+    }
+
+    .slide:hover .slide-bg {
+      transform: scale(1.05);
+      filter: brightness(1);
+    }
+
+    .shade {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.7), rgba(236, 72, 153, 0.5), rgba(20, 184, 166, 0.3));
+      mix-blend-mode: multiply;
+    }
+
+    .hero-text {
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      padding: 0 8%;
+      max-width: 900px;
+      top: 30%;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-text h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-text p {
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+      opacity: 0.95;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Controls */
+    .controls {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      z-index: 10;
+    }
+
+    .controls button {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .controls button:hover {
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(1.1);
+    }
+
+    .dots {
+      display: flex;
+      gap: 12px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .dot.active {
+      background: white;
+      width: 40px;
+      border-radius: 6px;
+    }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2.5rem;
+      padding: 5rem 5%;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+      transform: scaleX(0);
+      transition: transform 0.4s;
+    }
+
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1), transparent);
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.5s;
+      border-radius: 50%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 20px 60px var(--shadow);
+    }
+
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feature-card:hover::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .feature-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+      border-radius: 16px;
+      object-fit: cover;
+      transition: transform 0.4s;
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-card:hover img {
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    .feature-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+      position: relative;
+      z-index: 1;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* CTA */
+    .cta {
+      text-align: center;
+      padding: 5rem 5%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 70% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: pulse 8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.2) rotate(180deg); }
+    }
+
+    .cta > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: 1rem;
+    }
+
+    .cta p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    .cta .btn {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .cta .btn:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Footer */
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 5%;
+      text-align: center;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .nav {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .hero-text {
+        padding: 0 5%;
+      }
+
+      .controls button {
+        width: 40px;
+        height: 40px;
+      }
+
+      .features {
+        padding: 3rem 5%;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="particles" id="particles"></div>
+
+  <header class="site-header" id="header">
+    <a class="brand" href="index.html">
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=100&h=100&fit=crop" class="logo" alt="Air-DND Logo">
+      <span>Air-DND</span>
+    </a>
+    <nav class="nav" id="mainNav">
+      <a class="nav-link active" href="index.html"><span>Home</span></a>
+      <a class="nav-link" href="about.html"><span>About</span></a>
+      <a class="nav-link" href="contact.html"><span>Contact</span></a>
+      <button id="dark-toggle" class="toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <section class="carousel" aria-label="Featured content">
+    <div class="slides" id="slides">
+
+      <article class="slide">
+        <img class="slide-bg" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1920&h=1080&fit=crop" alt="Modern apartment interior" loading="eager">
+        <div class="shade"></div>
+        <div class="hero-text">
+          <h1>Simplify Property Management</h1>
+          <p>Automated rent collection, digital leases, and maintenance tracking — all in one powerful platform.</p>
+          <a class="btn" href="login.html"><span>Get Started Free</span></a>
+        </div>
+      </article>
+
+      <article class="slide">
+        <img class="slide-bg" src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1920&h=1080&fit=crop" alt="City skyline" loading="lazy">
+        <div class="shade"></div>
+        <div class="hero-text">
+          <h1>Built for Landlords</h1>
+          <p>Track payments, manage tenants, and oversee multiple properties with complete transparency.</p>
+          <a class="btn btn-ghost" href="#" onclick="goToLoginAs('landlord')"><span>Explore Dashboard</span></a>
+        </div>
+      </article>
+
+      <article class="slide">
+        <img class="slide-bg" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&h=1080&fit=crop" alt="Suburban home" loading="lazy">
+        <div class="shade"></div>
+        <div class="hero-text">
+          <h1>Designed for Tenants</h1>
+          <p>Pay rent online, submit maintenance requests, and access your lease agreement anytime, anywhere.</p>
+          <a class="btn btn-ghost" href="#" onclick="goToLoginAs('tenant')"><span>Tenant Portal</span></a>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="controls">
+      <button id="prev" aria-label="Previous slide">‹</button>
+      <div class="dots" id="dots" role="tablist" aria-label="Carousel navigation"></div>
+      <button id="next" aria-label="Next slide">›</button>
+    </div>
+  </section>
+
+  <section class="features">
+    <article class="feature-card">
+      <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=200&h=200&fit=crop" alt="Rent collection">
+      <h3>Automated Rent Collection</h3>
+      <p>Never miss a payment with automatic reminders, instant receipts, and real-time status updates for all your properties.</p>
+    </article>
+    
+    <article class="feature-card">
+      <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=200&h=200&fit=crop" alt="Maintenance management">
+      <h3>Maintenance Hub</h3>
+      <p>Submit, track, and resolve maintenance requests with full transparency. Keep detailed logs and communication history.</p>
+    </article>
+    
+    <article class="feature-card">
+      <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200&h=200&fit=crop" alt="Digital leases">
+      <h3>Digital Leases</h3>
+      <p>Store and manage lease agreements securely. Track deposits, renewal dates, and terms — completely paperless.</p>
+    </article>
+  </section>
+
+  <section class="cta">
+    <h2>Ready to manage smarter?</h2>
+    <p>Join thousands of landlords and tenants who trust our platform for hassle-free property management.</p>
+    <a href="login.html" class="btn"><span>Create Free Account</span></a>
+  </section>
+
+  <footer class="site-footer">
+    <p>© 2025 Air-DND Property Management. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Function to navigate to login with pre-selected role
+    function goToLoginAs(role) {
+      localStorage.setItem('preselectedRole', role);
+      window.location.href = 'login.html';
+      return false;
+    }
+
+    // Dark mode
+    const toggle = document.getElementById('dark-toggle');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Dynamic navigation based on user role
+    document.addEventListener('DOMContentLoaded', () => {
+      const userRole = localStorage.getItem('userRole');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const nav = document.getElementById('mainNav');
+      
+      if (isLoggedIn && userRole) {
+        const dashboardLink = document.createElement('a');
+        dashboardLink.className = 'nav-link';
+        dashboardLink.href = userRole === 'landlord' ? 'landlord.html' : 'tenant.html';
+        dashboardLink.innerHTML = `<span>${userRole === 'landlord' ? 'My Properties' : 'My Dashboard'}</span>`;
+        
+        const logoutBtn = document.createElement('a');
+        logoutBtn.className = 'nav-link';
+        logoutBtn.href = '#';
+        logoutBtn.innerHTML = '<span>Logout</span>';
+        logoutBtn.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.href = 'login.html';
+        };
+        
+        const toggleBtn = nav.querySelector('.toggle');
+        nav.insertBefore(dashboardLink, toggleBtn);
+        nav.insertBefore(logoutBtn, toggleBtn);
+      }
+    });
+
+    // Floating particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 15; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // Header scroll effect
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // Carousel
+    const slides = document.getElementById('slides');
+    const dotsContainer = document.getElementById('dots');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const slideCount = slides.children.length;
+    let currentSlide = 0;
+    let autoplayInterval;
+
+    for (let i = 0; i < slideCount; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'dot';
+      dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    const dots = dotsContainer.querySelectorAll('.dot');
+
+    function goToSlide(n) {
+      currentSlide = (n + slideCount) % slideCount;
+      slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+      
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+      });
+      
+      resetAutoplay();
+    }
+
+    function nextSlide() {
+      goToSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      goToSlide(currentSlide - 1);
+    }
+
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+
+    function startAutoplay() {
+      autoplayInterval = setInterval(nextSlide, 5000);
+    }
+
+    function resetAutoplay() {
+      clearInterval(autoplayInterval);
+      startAutoplay();
+    }
+
+    startAutoplay();
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+  </script>
+</body>
+</html>

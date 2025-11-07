@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tenant Dashboard | Air-DND</title>
+  <meta name="description" content="Manage your rent, lease, and maintenance requests easily">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #14b8a6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #f472b6;
+      --accent: #2dd4bf;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 5%;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      transition: transform 0.3s;
+    }
+
+    .brand:hover {
+      transform: scale(1.05);
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      transition: color 0.3s;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-link:hover::after, .nav-link.active::after {
+      width: 100%;
+    }
+
+    .toggle {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+
+    .toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 3rem 5%;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15), transparent);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .page-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 2.5rem);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-hero p {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem 5% 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .chip {
+      padding: 0.75rem 1.5rem;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px var(--shadow);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem 5% 4rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dashboard-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.8rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px var(--shadow);
+      border-color: var(--primary);
+    }
+
+    .dashboard-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      transition: transform 0.3s;
+    }
+
+    .dashboard-card:hover .card-icon {
+      transform: rotate(5deg) scale(1.05);
+    }
+
+    .card-info {
+      flex: 1;
+    }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .card-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card-amount {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .card-status {
+      display: inline-block;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: auto;
+    }
+
+    .status-paid {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .status-open {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .card-list {
+      list-style: none;
+    }
+
+    .card-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .card-list li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .card-list strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .card-list span {
+      color: var(--text-muted);
+    }
+
+    .modal {
+      border: none;
+      border-radius: 20px;
+      padding: 0;
+      max-width: 540px;
+      width: 90%;
+      background: var(--surface);
+      box-shadow: 0 24px 60px var(--shadow);
+      animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal::backdrop {
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-card {
+      padding: 2.5rem;
+    }
+
+    .modal h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      color: var(--text);
+    }
+
+    .field {
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+
+    .field span {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-ghost {
+      flex: 1;
+      padding: 1rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+
+    .site-footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2rem 5%;
+      text-align: center;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .quick-actions {
+        padding: 1.5rem 5% 1rem;
+        gap: 0.8rem;
+      }
+
+      .chip {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem 5% 3rem;
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      .card-amount {
+        font-size: 1.8rem;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <header class="site-header">
+    <a class="brand" href="index.html">
+      <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=100&h=100&fit=crop" class="logo" alt="Air-DND Logo">
+      <span>Air-DND</span>
+    </a>
+    <nav class="nav" id="mainNav">
+      <a class="nav-link" href="index.html"><span>Home</span></a>
+      <a class="nav-link" href="about.html"><span>About</span></a>
+      <a class="nav-link" href="landlord.html"><span>Landlord</span></a>
+      <a class="nav-link active" href="tenant.html"><span>Tenant</span></a>
+      <a class="nav-link" href="contact.html"><span>Contact</span></a>
+      <button id="dark-toggle" class="toggle" aria-label="Toggle dark mode">🌙</button>
+    </nav>
+  </header>
+
+  <section class="page-hero">
+    <h1>Tenant Dashboard</h1>
+    <p>Manage your rent, view your lease, and handle maintenance requests — all in one place.</p>
+  </section>
+
+  <section class="quick-actions">
+    <button class="chip" onclick="alert('Payment portal opening...')">💳 Pay Rent</button>
+    <button class="chip" onclick="alert('Loading lease document...')">📄 View Lease</button>
+    <button class="chip" id="open-maint">🔧 Maintenance Request</button>
+    <button class="chip" onclick="alert('Showing payment history...')">📊 Payment History</button>
+  </section>
+
+  <section class="cards-grid" id="tn-cards">
+  </section>
+
+  <dialog id="maint-modal" class="modal">
+    <form method="dialog" class="modal-card" id="maintForm">
+      
+      <h3>Submit Maintenance Request</h3>
+      
+      <label class="field">
+        <span>Property Address</span>
+        <input 
+          id="m-prop" 
+          type="text" 
+          placeholder="e.g., 45 MG Road Complex, Surat" 
+          required
+        />
+      </label>
+
+      <label class="field">
+        <span>Issue Description</span>
+        <textarea 
+          id="m-desc" 
+          rows="5" 
+          placeholder="Please describe the maintenance issue in detail..." 
+          required
+        ></textarea>
+      </label>
+
+      <label class="field">
+        <span>Priority Level</span>
+        <select id="m-priority">
+          <option value="low">Low - Can wait a few days</option>
+          <option value="medium" selected>Medium - Should be addressed soon</option>
+          <option value="high">High - Needs immediate attention</option>
+        </select>
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn" type="submit"><span>Submit Request</span></button>
+        <button class="btn-ghost" type="button" onclick="document.getElementById('maint-modal').close()">Cancel</button>
+      </div>
+
+    </form>
+  </dialog>
+
+  <footer class="site-footer">
+    <p>© 2025 Air-DND Property Management. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const toggle = document.getElementById('dark-toggle');
+    const html = document.documentElement;
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', savedTheme);
+    toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+    toggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+
+    // Dynamic navigation based on user role
+    document.addEventListener('DOMContentLoaded', () => {
+      const userRole = localStorage.getItem('userRole');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const nav = document.getElementById('mainNav');
+      
+      if (isLoggedIn && userRole) {
+        // Remove both landlord and tenant links
+        const links = nav.querySelectorAll('.nav-link');
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === 'landlord.html' || href === 'tenant.html') {
+            link.remove();
+          }
+        });
+        
+        // Add user's dashboard link
+        const dashboardLink = document.createElement('a');
+        dashboardLink.className = 'nav-link active';
+        dashboardLink.href = userRole === 'landlord' ? 'landlord.html' : 'tenant.html';
+        dashboardLink.innerHTML = `<span>${userRole === 'landlord' ? 'My Properties' : 'My Dashboard'}</span>`;
+        
+        // Add logout button
+        const logoutBtn = document.createElement('a');
+        logoutBtn.className = 'nav-link';
+        logoutBtn.href = '#';
+        logoutBtn.innerHTML = '<span>Logout</span>';
+        logoutBtn.onclick = (e) => {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.href = 'login.html';
+        };
+        
+        const toggleBtn = nav.querySelector('.toggle');
+        nav.insertBefore(dashboardLink, toggleBtn);
+        nav.insertBefore(logoutBtn, toggleBtn);
+      }
+    });
+
+    const cardsData = [
+      {
+        icon: '💰',
+        title: 'Current Rent',
+        subtitle: 'Monthly payment',
+        amount: '₹25,000',
+        status: 'Paid',
+        statusClass: 'status-paid',
+        type: 'amount'
+      },
+      {
+        icon: '📅',
+        title: 'Next Due Date',
+        subtitle: 'Rent payment',
+        amount: 'Dec 1, 2025',
+        status: 'Upcoming',
+        statusClass: 'status-pending',
+        type: 'amount'
+      },
+      {
+        icon: '🔧',
+        title: 'Maintenance',
+        subtitle: 'Active tickets',
+        amount: '2',
+        status: 'Open',
+        statusClass: 'status-open',
+        type: 'amount'
+      },
+      {
+        icon: '🏠',
+        title: 'Property Details',
+        subtitle: 'Current residence',
+        list: [
+          { label: 'Address', value: '45 MG Road Complex' },
+          { label: 'Type', value: '2 BHK Apartment' },
+          { label: 'Lease End', value: 'Jun 30, 2026' }
+        ],
+        type: 'list'
+      },
+      {
+        icon: '📊',
+        title: 'Payment History',
+        subtitle: 'Last 3 months',
+        list: [
+          { label: 'November 2025', value: '₹25,000 ✓' },
+          { label: 'October 2025', value: '₹25,000 ✓' },
+          { label: 'September 2025', value: '₹25,000 ✓' }
+        ],
+        type: 'list'
+      },
+      {
+        icon: '📄',
+        title: 'Lease Agreement',
+        subtitle: 'Contract details',
+        list: [
+          { label: 'Start Date', value: 'Jul 1, 2024' },
+          { label: 'Duration', value: '2 Years' },
+          { label: 'Deposit', value: '₹50,000' }
+        ],
+        type: 'list'
+      }
+    ];
+
+    const cardsGrid = document.getElementById('tn-cards');
+    cardsData.forEach(card => {
+      const cardEl = document.createElement('article');
+      cardEl.className = 'dashboard-card';
+      
+      let content = `
+        <div class="card-header">
+          <div class="card-info">
+            <h3 class="card-title">${card.title}</h3>
+            <p class="card-subtitle">${card.subtitle}</p>
+          </div>
+          <div class="card-icon">${card.icon}</div>
+        </div>
+      `;
+      
+      content += '<div class="card-content">';
+      
+      if (card.type === 'amount') {
+        content += `<div class="card-amount">${card.amount}</div>`;
+        if (card.status) {
+          content += `<span class="card-status ${card.statusClass}">${card.status}</span>`;
+        }
+      } else if (card.type === 'list') {
+        content += '<ul class="card-list">';
+        card.list.forEach(item => {
+          content += `<li><strong>${item.label}</strong><span>${item.value}</span></li>`;
+        });
+        content += '</ul>';
+      }
+      
+      content += '</div>';
+      
+      cardEl.innerHTML = content;
+      cardsGrid.appendChild(cardEl);
+    });
+
+    const modal = document.getElementById('maint-modal');
+    const openBtn = document.getElementById('open-maint');
+    const form = document.getElementById('maintForm');
+
+    openBtn.addEventListener('click', () => {
+      modal.showModal();
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const prop = document.getElementById('m-prop').value;
+      const desc = document.getElementById('m-desc').value;
+      const priority = document.getElementById('m-priority').value;
+      
+      alert(`Maintenance request submitted!\n\nProperty: ${prop}\nPriority: ${priority}\n\nYour request will be reviewed shortly.`);
+      
+      form.reset();
+      modal.close();
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.close();
+      }
+    });
+  </script>
+</body>
+</html>
