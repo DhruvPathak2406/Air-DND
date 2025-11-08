@@ -6,6 +6,9 @@ const toggleBtn = document.getElementById("dark-toggle");
 const savedTheme = localStorage.getItem("theme") || "light";
 if (savedTheme === "dark") {
   root.classList.add("dark");
+  root.setAttribute('data-theme', 'dark');
+} else {
+  root.setAttribute('data-theme', 'light');
 }
 
 // Update toggle button icon
@@ -22,6 +25,7 @@ if (toggleBtn) {
   toggleBtn.addEventListener("click", () => {
     root.classList.toggle("dark");
     const newTheme = root.classList.contains("dark") ? "dark" : "light";
+    root.setAttribute('data-theme', newTheme);
     localStorage.setItem("theme", newTheme);
     updateToggleIcon();
     
@@ -172,9 +176,9 @@ if (loginForm) {
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     
-    const role = document.getElementById("role").value;
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const role = document.getElementById("role")?.value;
+    const username = document.getElementById("username")?.value;
+    const password = document.getElementById("password")?.value;
 
     if (!role || !username || !password) {
       alert("Please fill in all fields");
@@ -189,6 +193,10 @@ if (loginForm) {
 
     // Simulate authentication delay
     setTimeout(() => {
+      // Store user role and login status
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('isLoggedIn', 'true');
+      
       // In production, validate credentials with backend
       if (role === "landlord") {
         window.location.href = "landlord.html";
@@ -345,9 +353,10 @@ window.maintenanceProperty = (id) => {
   alert(`Viewing maintenance requests for property ${id}\n\nThis would show all maintenance history in production.`);
 };
 
-/* ========== Tenant Dashboard Data ========== */
+/* ========== Tenant Dashboard Data - Only if cards don't exist ========== */
+// This will only run if the inline script hasn't already created the cards
 const tnCardsEl = document.getElementById("tn-cards");
-if (tnCardsEl) {
+if (tnCardsEl && tnCardsEl.children.length === 0) {
   const tenantData = [
     {
       title: "Next Rent Payment",
@@ -408,13 +417,14 @@ window.viewReceipts = () => {
   alert("Generating receipts...\n\nThis would show downloadable payment receipts in production.");
 };
 
-/* ========== Maintenance Modal Handler ========== */
+/* ========== Maintenance Modal Handler (ENHANCED) ========== */
 const modal = document.getElementById("maint-modal");
 const openMaintBtn = document.getElementById("open-maint");
 const maintForm = document.getElementById("maintForm");
 
 if (openMaintBtn && modal) {
-  openMaintBtn.addEventListener("click", () => {
+  openMaintBtn.addEventListener("click", (e) => {
+    e.preventDefault();
     modal.showModal();
   });
 }
@@ -423,26 +433,43 @@ if (maintForm && modal) {
   maintForm.addEventListener("submit", (e) => {
     e.preventDefault();
     
-    const property = document.getElementById("m-prop").value;
-    const description = document.getElementById("m-desc").value;
+    const property = document.getElementById("m-prop")?.value;
+    const description = document.getElementById("m-desc")?.value;
+    const priority = document.getElementById("m-priority")?.value;
+
+    if (!property || !description) {
+      alert("⚠️ Please fill in all required fields!");
+      return;
+    }
     
-    // Simulate submission
+    // Close modal first
     modal.close();
     
     // Show success message
     setTimeout(() => {
-      alert(`✅ Maintenance Request Submitted\n\nProperty: ${property}\nDescription: ${description}\n\nYou will receive updates via email.`);
+      alert(`✅ Maintenance Request Submitted Successfully!\n\nProperty: ${property}\nPriority: ${priority ? priority.toUpperCase() : 'MEDIUM'}\n\nYou will receive updates via email within 24-48 hours.`);
       maintForm.reset();
     }, 300);
   });
 
   // Close on backdrop click
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
+    const modalCard = modal.querySelector('.modal-card');
+    if (modalCard && !modalCard.contains(e.target)) {
       modal.close();
+      maintForm.reset();
     }
   });
 }
+
+// Handle cancel button for modal
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('btn-ghost') && modal && modal.open) {
+    e.preventDefault();
+    modal.close();
+    if (maintForm) maintForm.reset();
+  }
+});
 
 /* ========== Contact Form Handler ========== */
 const contactForm = document.querySelector(".contact-form");
@@ -464,6 +491,54 @@ if (contactForm) {
       submitBtn.disabled = false;
     }, 1500);
   });
+}
+
+/* ========== Dynamic Navigation Based on User Role ========== */
+document.addEventListener('DOMContentLoaded', () => {
+  const userRole = localStorage.getItem('userRole');
+  const isLoggedIn = localStorage.getItem('isLoggedIn');
+  const nav = document.getElementById('mainNav');
+  
+  if (isLoggedIn && userRole && nav) {
+    // Remove landlord and tenant links
+    const links = nav.querySelectorAll('.nav-link');
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === 'landlord.html' || href === 'tenant.html') {
+        link.remove();
+      }
+    });
+    
+    // Add user's dashboard link
+    const dashboardLink = document.createElement('a');
+    dashboardLink.className = 'nav-link';
+    dashboardLink.href = userRole === 'landlord' ? 'landlord.html' : 'tenant.html';
+    dashboardLink.innerHTML = `<span>${userRole === 'landlord' ? 'My Properties' : 'My Dashboard'}</span>`;
+    
+    // Add logout button
+    const logoutBtn = document.createElement('a');
+    logoutBtn.className = 'nav-link';
+    logoutBtn.href = '#';
+    logoutBtn.innerHTML = '<span>Logout</span>';
+    logoutBtn.onclick = (e) => {
+      e.preventDefault();
+      localStorage.clear();
+      window.location.href = 'login.html';
+    };
+    
+    const toggleBtn = nav.querySelector('.toggle');
+    if (toggleBtn) {
+      nav.insertBefore(dashboardLink, toggleBtn);
+      nav.insertBefore(logoutBtn, toggleBtn);
+    }
+  }
+});
+
+/* ========== Preselected Role from Home Page ========== */
+window.goToLoginAs = function(role) {
+  localStorage.setItem('preselectedRole', role);
+  window.location.href = 'login.html';
+  return false;
 }
 
 /* ========== Smooth Scroll for Anchor Links ========== */

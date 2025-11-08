@@ -768,23 +768,53 @@
       modal.showModal();
     });
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const prop = document.getElementById('m-prop').value;
-      const desc = document.getElementById('m-desc').value;
-      const priority = document.getElementById('m-priority').value;
-      
-      alert(`Maintenance request submitted!\n\nProperty: ${prop}\nPriority: ${priority}\n\nYour request will be reviewed shortly.`);
-      
-      form.reset();
-      modal.close();
+    form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const prop = document.getElementById('m-prop').value.trim();
+  const desc = document.getElementById('m-desc').value.trim();
+  const priority = document.getElementById('m-priority').value;
+
+  if (!prop || !desc || !priority) {
+    alert("Please fill all fields before submitting.");
+    return;
+  }
+
+  try {
+    const response = await fetch("backend/submit_maintenance.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        property: prop,
+        description: desc,
+        priority: priority,
+      }),
     });
 
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.close();
-      }
-    });
+    const result = await response.text();
+
+    if (result.trim() === "success") {
+      alert("✅ Maintenance request submitted successfully!");
+      form.reset();
+      modal.close();
+    } else if (result.trim() === "missing_fields") {
+      alert("⚠️ Missing some fields. Please fill everything.");
+    } else if (result.trim() === "db_error") {
+      alert("❌ Database connection issue. Try again later.");
+    } else {
+      alert("⚠️ Something went wrong. Please retry.");
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("❌ Network error. Please try again.");
+  }
+});
+
   </script>
 </body>
 </html>
+<script src="assets/js/script.js" defer></script>
+
