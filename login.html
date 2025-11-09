@@ -656,175 +656,205 @@
   </footer>
 
   <script>
-    const toggle = document.getElementById('dark-toggle');
-    const html = document.documentElement;
-    
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    html.setAttribute('data-theme', savedTheme);
-    toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+/* -------------- THEME & UI HANDLERS (unchanged behavior) -------------- */
+const toggle = document.getElementById('dark-toggle');
+const html = document.documentElement;
+const savedTheme = localStorage.getItem('theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+toggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+toggle.addEventListener('click', () => {
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+});
 
-    toggle.addEventListener('click', () => {
-      const current = html.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      toggle.textContent = next === 'dark' ? '☀️' : '🌙';
-    });
+/* -------------- MODE TOGGLE (signin/signup) -------------- */
+const modeButtons = document.querySelectorAll('.mode-btn');
+const signinForm = document.getElementById('signinForm');
+const signupForm = document.getElementById('signupForm');
+const authTitle = document.getElementById('auth-title');
+const authSubtitle = document.getElementById('auth-subtitle');
 
-    // Mode toggle
-    const modeButtons = document.querySelectorAll('.mode-btn');
-    const signinForm = document.getElementById('signinForm');
-    const signupForm = document.getElementById('signupForm');
-    const authTitle = document.getElementById('auth-title');
-    const authSubtitle = document.getElementById('auth-subtitle');
-
-    modeButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.dataset.mode;
-        
-        modeButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        if (mode === 'signin') {
-          signinForm.classList.add('active');
-          signupForm.classList.remove('active');
-          authTitle.textContent = 'Welcome Back';
-          authSubtitle.textContent = 'Sign in to access your dashboard';
-        } else {
-          signupForm.classList.add('active');
-          signinForm.classList.remove('active');
-          authTitle.textContent = 'Create Account';
-          authSubtitle.textContent = 'Join Air-DND and start managing properties';
-        }
-      });
-    });
-
-    // Check for preselected role from home page
-    const preselectedRole = localStorage.getItem('preselectedRole');
-    if (preselectedRole) {
-      // Auto-select the role card
-      const signinRoleCards = document.querySelectorAll('#signinForm .role-card');
-      const signupRoleCards = document.querySelectorAll('#signup-role-cards .role-card');
-      
-      signinRoleCards.forEach(card => {
-        if (card.dataset.role === preselectedRole) {
-          card.classList.add('selected');
-          document.getElementById('signin-role').value = preselectedRole;
-        }
-      });
-      
-      signupRoleCards.forEach(card => {
-        if (card.dataset.role === preselectedRole) {
-          card.classList.add('selected');
-          document.getElementById('signup-role').value = preselectedRole;
-        }
-      });
-      
-      // Clear the preselected role
-      localStorage.removeItem('preselectedRole');
+modeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    modeButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (mode === 'signin') {
+      signinForm.classList.add('active');
+      signupForm.classList.remove('active');
+      authTitle.textContent = 'Welcome Back';
+      authSubtitle.textContent = 'Sign in to access your dashboard';
+    } else {
+      signupForm.classList.add('active');
+      signinForm.classList.remove('active');
+      authTitle.textContent = 'Create Account';
+      authSubtitle.textContent = 'Join Air-DND and start managing properties';
     }
+  });
+});
 
-    // Role selection for signin
-    const signinRoleCards = document.querySelectorAll('#signinForm .role-card');
-    const signinRoleInput = document.getElementById('signin-role');
+/* -------------- ROLE CARD SELECTION -------------- */
+const signinRoleCards = document.querySelectorAll('#signinForm .role-card');
+const signinRoleInput = document.getElementById('signin-role');
+const signupRoleCards = document.querySelectorAll('#signup-role-cards .role-card');
+const signupRoleInput = document.getElementById('signup-role');
 
-    signinRoleCards.forEach(card => {
-      card.addEventListener('click', () => {
-        signinRoleCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        signinRoleInput.value = card.dataset.role;
-      });
+function wireRoleCards(cards, input) {
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      input.value = card.dataset.role;
     });
+  });
+}
+wireRoleCards(signinRoleCards, signinRoleInput);
+wireRoleCards(signupRoleCards, signupRoleInput);
 
-    // Role selection for signup
-    const signupRoleCards = document.querySelectorAll('#signup-role-cards .role-card');
-    const signupRoleInput = document.getElementById('signup-role');
+/* Preselected from home */
+const preselectedRole = localStorage.getItem('preselectedRole');
+if (preselectedRole) {
+  signinRoleCards.forEach(card => {
+    if (card.dataset.role === preselectedRole) {
+      card.classList.add('selected');
+      signinRoleInput.value = preselectedRole;
+    }
+  });
+  signupRoleCards.forEach(card => {
+    if (card.dataset.role === preselectedRole) {
+      card.classList.add('selected');
+      signupRoleInput.value = preselectedRole;
+    }
+  });
+  localStorage.removeItem('preselectedRole');
+}
 
-    signupRoleCards.forEach(card => {
-      card.addEventListener('click', () => {
-        signupRoleCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        signupRoleInput.value = card.dataset.role;
-      });
-    });
+/* -------------- PASSWORD TOGGLE UI -------------- */
+document.querySelectorAll('.password-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = btn.previousElementSibling;
+    if (!input) return;
+    const type = input.type === 'password' ? 'text' : 'password';
+    input.type = type;
+    btn.textContent = type === 'password' ? '👁️' : '🙈';
+  });
+});
 
-    // Password toggle for all password fields
-    document.querySelectorAll('.password-toggle').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const input = btn.previousElementSibling;
-        const type = input.type === 'password' ? 'text' : 'password';
-        input.type = type;
-        btn.textContent = type === 'password' ? '👁️' : '🙈';
-      });
-    });
+/* ---------- IMPORTANT: endpoints (relative) ---------- */
+/* Use relative paths so the requests go to the same site you opened in browser.
+   Make sure login.php and register.php live in C:\xampp\htdocs\Air-DND\backend\  */
+const LOGIN_ENDPOINT  = "backend/login.php";
+const REGISTER_ENDPOINT = "backend/register.php";
 
-    // Sign In form submission
-    signinForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const role = signinRoleInput.value;
-      if (!role) {
-        alert('Please select your role (Landlord or Tenant)');
-        return;
-      }
+/* ---------- HELPERS ---------- */
+function showAlert(msg) {
+  // Basic UI alert wrapper; can be swapped with custom modal later
+  alert(msg);
+}
 
-      const formData = new FormData(signinForm);
-      const data = Object.fromEntries(formData);
-      data.role = role;
-      
-      console.log('Sign In:', data);
-      
-      // Store user role in localStorage
-      localStorage.setItem('userRole', role);
-      localStorage.setItem('isLoggedIn', 'true');
-      
-      // Redirect based on role
-      if (role === 'landlord') {
-        window.location.href = 'landlord.html';
-      } else {
-        window.location.href = 'tenant.html';
-      }
-    });
+async function fetchJson(url, options) {
+  const res = await fetch(url, options);
+  const text = await res.text(); // read raw text first (helps debug PHP)
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("Non-JSON response from", url, ":", text);
+    throw new Error("Invalid JSON from server. See console.");
+  }
+}
 
-    // Sign Up form submission
-    signupForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const role = signupRoleInput.value;
-      if (!role) {
-        alert('Please select your role (Landlord or Tenant)');
-        return;
-      }
+/* ========== SIGN IN (backend login.php) ========== */
+signinForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const role = signinRoleInput.value;
+  if (!role) {
+    showAlert("Please select your role (Landlord or Tenant)");
+    return;
+  }
 
-      const formData = new FormData(signupForm);
-      const password = formData.get('password');
-      const confirmPassword = formData.get('confirmPassword');
+  const formData = new FormData(signinForm);
+  formData.set("role", role);
 
-      if (password !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
-      }
+  // quick UI lock
+  const submitBtn = signinForm.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Signing in...";
 
-      const data = Object.fromEntries(formData);
-      data.role = role;
-      delete data.confirmPassword;
-      
-      console.log('Sign Up:', data);
-      
-      // Store user role in localStorage
-      localStorage.setItem('userRole', role);
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userName', data.firstName + ' ' + data.lastName);
-      
-      alert('Account created successfully!');
-      
-      // Redirect based on role
-      if (role === 'landlord') {
-        window.location.href = 'landlord.html';
-      } else {
-        window.location.href = 'tenant.html';
-      }
-    });
-  </script>
-</body>
-</html>
+  try {
+    console.log("Posting to", LOGIN_ENDPOINT);
+    const result = await fetchJson(LOGIN_ENDPOINT, { method: "POST", body: formData });
+    console.log("login response:", result);
+
+    if (result.status === "success") {
+      showAlert(`Welcome back, ${result.username || 'user'}!`);
+      localStorage.setItem("userRole", result.role || role);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userName", result.username || '');
+      // redirect by role
+      window.location.href = (result.role === "landlord") ? "landlord.html" : "tenant.html";
+    } else {
+      showAlert("❌ " + (result.message || "Login failed"));
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    showAlert("⚠️ Could not reach backend. Make sure Apache & MySQL are running and open this page via http://localhost/Air-DND/login.html");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Sign In";
+  }
+});
+
+/* ========== SIGN UP (backend register.php) ========== */
+signupForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const role = signupRoleInput.value;
+  if (!role) {
+    showAlert("Please select your role (Landlord or Tenant)");
+    return;
+  }
+
+  const formData = new FormData(signupForm);
+  // We expect the backend to accept: username, email, password, role (and optionally firstName, lastName, phone)
+  const password = formData.get('password');
+  const confirm = formData.get('confirmPassword');
+  if (password !== confirm) {
+    showAlert("Passwords do not match!");
+    return;
+  }
+  formData.set('role', role);
+
+  // lock
+  const submitBtn = signupForm.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Creating account...";
+
+  try {
+    console.log("Posting to", REGISTER_ENDPOINT);
+    const result = await fetchJson(REGISTER_ENDPOINT, { method: "POST", body: formData });
+    console.log("register response:", result);
+
+    if (result.status === "success") {
+      showAlert("✅ Account created successfully!");
+      localStorage.setItem("userRole", role);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userName", (formData.get('firstName') || '') + ' ' + (formData.get('lastName') || ''));
+      // redirect to tenant/landlord
+      window.location.href = (role === "landlord") ? "landlord.html" : "tenant.html";
+    } else {
+      showAlert("❌ " + (result.message || "Registration failed"));
+    }
+  } catch (err) {
+    console.error("Register error:", err);
+    showAlert("⚠️ Something went wrong while creating your account. Check console & network response.");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Create Account";
+  }
+});
+
+/* ========== DEBUG: show network hints in console (optional) ========== */
+console.log("Login page script loaded. Endpoints:", { LOGIN_ENDPOINT, REGISTER_ENDPOINT });
+</script>

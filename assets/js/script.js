@@ -184,6 +184,99 @@ if (loginForm) {
       alert("Please fill in all fields");
       return;
     }
+    // Sign In form submission (Database Connected)
+signinForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const role = signinRoleInput.value;
+  if (!role) {
+    alert('Please select your role (Landlord or Tenant)');
+    return;
+  }
+
+  const formData = new FormData(signinForm);
+  formData.append("role", role);
+
+  try {
+    const response = await fetch("backend/login.php", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await response.json();
+    console.log("Server Response:", result);
+
+    if (result.status === "success") {
+      alert(`Welcome back, ${result.username}!`);
+      localStorage.setItem("userRole", result.role);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userName", result.username);
+
+      // Redirect to role-based dashboard
+      if (result.role === "landlord") {
+        window.location.href = "landlord.html";
+      } else {
+        window.location.href = "tenant.html";
+      }
+    } else {
+      alert("❌ " + result.message);
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    alert("⚠️ Unable to reach server. Make sure Apache & MySQL are running in XAMPP.");
+  }
+});
+// ✅ Real Signup Logic (Full Form + Database Connected)
+signupForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const role = signupRoleInput.value;
+  if (!role) {
+    alert("Please select your role (Landlord or Tenant)");
+    return;
+  }
+
+  const formData = new FormData(signupForm);
+  formData.append("role", role);
+
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  try {
+    const response = await fetch("backend/register.php", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+    console.log("Signup response:", result);
+
+    if (result.status === "success") {
+      alert("✅ " + result.message);
+      localStorage.setItem("userRole", result.role);
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userName", result.username);
+
+      if (result.role === "landlord") {
+        window.location.href = "landlord.html";
+      } else {
+        window.location.href = "tenant.html";
+      }
+    } else {
+      alert("❌ " + result.message);
+    }
+  } catch (err) {
+    console.error("Error:", err);
+    alert("⚠️ Could not reach backend/register.php — check XAMPP Apache/MySQL.");
+  }
+});
+
+
 
     // Add loading state
     const submitBtn = loginForm.querySelector('button[type="submit"]');
@@ -399,25 +492,98 @@ if (tnCardsEl && tnCardsEl.children.length === 0) {
     </article>
   `).join("");
 }
+/* ========== Payment Modal Handler ========== */
+const paymentModal = document.getElementById("payment-modal");
+const payRentBtn = document.querySelector(".btn:nth-child(1)");
+const closePaymentModal = document.getElementById("closePaymentModal");
 
-// Tenant action handlers
-window.payRent = () => {
-  alert("Redirecting to payment gateway...\n\nThis would integrate with a payment processor in production.");
-};
+if (payRentBtn && paymentModal && closePaymentModal) {
+  payRentBtn.addEventListener("click", () => paymentModal.showModal());
+  closePaymentModal.addEventListener("click", () => paymentModal.close());
+}
 
-window.viewLease = () => {
-  alert("Opening lease agreement...\n\nThis would display the PDF lease document in production.");
-};
+/* ========== Payment Form Submission ========== */
+const paymentForm = document.getElementById("paymentForm");
+if (paymentForm) {
+  paymentForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(paymentForm);
 
-window.viewMaintenance = () => {
-  alert("Loading maintenance requests...\n\nThis would show all your maintenance request history in production.");
-};
+    try {
+      const response = await fetch("backend/payment_portal.php", {
+        method: "POST",
+        body: formData
+      });
+      const result = await response.json();
 
-window.viewReceipts = () => {
-  alert("Generating receipts...\n\nThis would show downloadable payment receipts in production.");
-};
+      if (result.status === "success") {
+        alert("✅ Payment successful!");
+        paymentModal.close();
+        paymentForm.reset();
+      } else {
+        alert("❌ " + result.message);
+      }
+    } catch (err) {
+      alert("⚠️ Error processing payment.");
+      console.error(err);
+    }
+  });
+}
 
-/* ========== Maintenance Modal Handler (ENHANCED) ========== */
+/* ========== Tenant Dashboard Actions ========== */
+
+// ✅ Fetch and Display Payment History
+async function viewPaymentHistory() {
+  try {
+    const response = await fetch("backend/payment_history.php");
+    const data = await response.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      alert("No payment history found.");
+      return;
+    }
+
+    let msg = "💳 Payment History:\n\n";
+    data.forEach(p => {
+      msg += `• ₹${p.amount} — ${p.status} on ${new Date(p.payment_date).toLocaleDateString()}\n`;
+    });
+
+    alert(msg);
+  } catch (err) {
+    console.error(err);
+    alert("Error fetching payment history.");
+  }
+}
+
+// ✅ Fetch and Display Lease Details
+async function viewLease() {
+  try {
+    const response = await fetch("backend/fetch_lease_details.php");
+    const data = await response.json();
+
+    if (data.error) {
+      alert("No lease data found for this tenant.");
+      return;
+    }
+
+    alert(`🏠 Lease Details:\n\nProperty: ${data.address}, ${data.city}\nStart: ${data.start_date}\nEnd: ${data.end_date}\nRent Due: ${data.rent_due_date}\nDeposit: ₹${data.deposit_amount}`);
+  } catch (err) {
+    console.error(err);
+    alert("Error fetching lease details.");
+  }
+}
+
+// ✅ Pay Rent (modal or redirect fallback)
+function payRent() {
+  if (paymentModal) {
+    paymentModal.showModal();
+  } else {
+    alert("Payment portal opening...");
+    window.location.href = "backend/payment_portal.php";
+  }
+}
+
+/* ========== Maintenance Modal Handler (Enhanced) ========== */
 const modal = document.getElementById("maint-modal");
 const openMaintBtn = document.getElementById("open-maint");
 const maintForm = document.getElementById("maintForm");
@@ -432,7 +598,6 @@ if (openMaintBtn && modal) {
 if (maintForm && modal) {
   maintForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    
     const property = document.getElementById("m-prop")?.value;
     const description = document.getElementById("m-desc")?.value;
     const priority = document.getElementById("m-priority")?.value;
@@ -441,18 +606,15 @@ if (maintForm && modal) {
       alert("⚠️ Please fill in all required fields!");
       return;
     }
-    
-    // Close modal first
+
     modal.close();
-    
-    // Show success message
+
     setTimeout(() => {
       alert(`✅ Maintenance Request Submitted Successfully!\n\nProperty: ${property}\nPriority: ${priority ? priority.toUpperCase() : 'MEDIUM'}\n\nYou will receive updates via email within 24-48 hours.`);
       maintForm.reset();
     }, 300);
   });
 
-  // Close on backdrop click
   modal.addEventListener("click", (e) => {
     const modalCard = modal.querySelector('.modal-card');
     if (modalCard && !modalCard.contains(e.target)) {
@@ -462,7 +624,6 @@ if (maintForm && modal) {
   });
 }
 
-// Handle cancel button for modal
 document.addEventListener('click', (e) => {
   if (e.target.classList.contains('btn-ghost') && modal && modal.open) {
     e.preventDefault();
@@ -476,14 +637,13 @@ const contactForm = document.querySelector(".contact-form");
 if (contactForm) {
   contactForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    
+
     const submitBtn = contactForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
-    
+
     submitBtn.textContent = "Sending...";
     submitBtn.disabled = true;
-    
-    // Simulate sending
+
     setTimeout(() => {
       alert("✅ Message sent successfully!\n\nWe'll get back to you within 24 hours.");
       contactForm.reset();
@@ -498,9 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const userRole = localStorage.getItem('userRole');
   const isLoggedIn = localStorage.getItem('isLoggedIn');
   const nav = document.getElementById('mainNav');
-  
+
   if (isLoggedIn && userRole && nav) {
-    // Remove landlord and tenant links
     const links = nav.querySelectorAll('.nav-link');
     links.forEach(link => {
       const href = link.getAttribute('href');
@@ -508,14 +667,12 @@ document.addEventListener('DOMContentLoaded', () => {
         link.remove();
       }
     });
-    
-    // Add user's dashboard link
+
     const dashboardLink = document.createElement('a');
     dashboardLink.className = 'nav-link';
     dashboardLink.href = userRole === 'landlord' ? 'landlord.html' : 'tenant.html';
     dashboardLink.innerHTML = `<span>${userRole === 'landlord' ? 'My Properties' : 'My Dashboard'}</span>`;
-    
-    // Add logout button
+
     const logoutBtn = document.createElement('a');
     logoutBtn.className = 'nav-link';
     logoutBtn.href = '#';
@@ -525,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.clear();
       window.location.href = 'login.html';
     };
-    
+
     const toggleBtn = nav.querySelector('.toggle');
     if (toggleBtn) {
       nav.insertBefore(dashboardLink, toggleBtn);
@@ -535,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ========== Preselected Role from Home Page ========== */
-window.goToLoginAs = function(role) {
+window.goToLoginAs = function (role) {
   localStorage.setItem('preselectedRole', role);
   window.location.href = 'login.html';
   return false;
@@ -582,7 +739,6 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, observerOptions);
 
-// Observe cards and features
 setTimeout(() => {
   document.querySelectorAll('.card, .feature-card, .highlight, .panel').forEach(el => {
     el.style.opacity = '0';

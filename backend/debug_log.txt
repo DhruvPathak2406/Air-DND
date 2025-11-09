@@ -1,0 +1,11 @@
+Array
+(
+    [role] => tenant
+    [firstName] => arvind 
+    [lastName] => tirumani raj
+    [email] => arvind47@gmail.com
+    [phone] => 23732323892389
+    [username] => arvind
+    [password] => 123456789
+    [confirmPassword] => 123456789
+)
