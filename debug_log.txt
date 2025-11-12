@@ -1,0 +1,33 @@
+Array
+(
+    [role] => landlord
+    [firstName] => Dhruv
+    [lastName] => pathak
+    [email] => studyaccdhruv@gmail.com
+    [phone] => 9819896728
+    [username] => dhruv_p2406
+    [password] => proj0101
+    [confirmPassword] => proj0101
+)
+Array
+(
+    [role] => landlord
+    [firstName] => Dhruv
+    [lastName] => pathak
+    [email] => studyaccdhruv@gmail.com
+    [phone] => 9819896728
+    [username] => dhruv_p2406
+    [password] => proj0101
+    [confirmPassword] => proj0101
+)
+Array
+(
+    [role] => landlord
+    [firstName] => Dhruv
+    [lastName] => pathak
+    [email] => something@coed.svnit.ac.in
+    [phone] => 3279487398
+    [username] => teacherteaches
+    [password] => proj0101
+    [confirmPassword] => proj0101
+)

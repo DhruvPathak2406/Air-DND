@@ -565,23 +565,27 @@
     const form = document.getElementById('contactForm');
     const successMessage = document.getElementById('successMessage');
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData);
-      
-      console.log('Form submitted:', data);
-      
-      successMessage.classList.add('show');
-      form.reset();
-      
-      setTimeout(() => {
-        successMessage.classList.remove('show');
-      }, 5000);
-      
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+
+  const response = await fetch("contact_submit.php", {
+    method: "POST",
+    body: formData
+  });
+
+  const result = await response.json();
+  
+  if (result.status === "success") {
+    successMessage.classList.add('show');
+    form.reset();
+    setTimeout(() => successMessage.classList.remove('show'), 5000);
+  } else {
+    alert("Error: " + result.message);
+  }
+});
+
   </script>
 </body>
 </html>

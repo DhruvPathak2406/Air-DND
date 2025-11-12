@@ -746,8 +746,9 @@ document.querySelectorAll('.password-toggle').forEach(btn => {
 /* ---------- IMPORTANT: endpoints (relative) ---------- */
 /* Use relative paths so the requests go to the same site you opened in browser.
    Make sure login.php and register.php live in C:\xampp\htdocs\Air-DND\backend\  */
-const LOGIN_ENDPOINT  = "backend/login.php";
-const REGISTER_ENDPOINT = "backend/register.php";
+const LOGIN_ENDPOINT  = "/AirDND/login.php";
+const REGISTER_ENDPOINT = "/AirDND/register.php";
+
 
 /* ---------- HELPERS ---------- */
 function showAlert(msg) {
@@ -770,6 +771,7 @@ async function fetchJson(url, options) {
 signinForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const role = signinRoleInput.value;
+
   if (!role) {
     showAlert("Please select your role (Landlord or Tenant)");
     return;
@@ -778,29 +780,35 @@ signinForm.addEventListener('submit', async (e) => {
   const formData = new FormData(signinForm);
   formData.set("role", role);
 
-  // quick UI lock
   const submitBtn = signinForm.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
   submitBtn.textContent = "Signing in...";
 
   try {
-    console.log("Posting to", LOGIN_ENDPOINT);
     const result = await fetchJson(LOGIN_ENDPOINT, { method: "POST", body: formData });
-    console.log("login response:", result);
 
     if (result.status === "success") {
-      showAlert(`Welcome back, ${result.username || 'user'}!`);
-      localStorage.setItem("userRole", result.role || role);
+
+      // welcome messages
+      if (role === "landlord") {
+        alert("Welcome back, Dhruv!");
+      } else if (role === "tenant") {
+        alert("Welcome back, Nandos!");
+      }
+
+      localStorage.setItem("userRole", role);
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userName", result.username || '');
-      // redirect by role
-      window.location.href = (result.role === "landlord") ? "landlord.html" : "tenant.html";
+
+      // redirect user
+      window.location.href = (role === "landlord") ? "landlord.html" : "tenant.html";
+
     } else {
       showAlert("❌ " + (result.message || "Login failed"));
     }
+
   } catch (err) {
     console.error("Login error:", err);
-    showAlert("⚠️ Could not reach backend. Make sure Apache & MySQL are running and open this page via http://localhost/Air-DND/login.html");
+    showAlert("⚠️ Could not reach backend. Make sure Apache & MySQL are running.");
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Sign In";
